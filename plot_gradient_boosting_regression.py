@@ -25,16 +25,16 @@ from sklearn.metrics import mean_squared_error
 ###############################################################################
 # Load data
 #boston = datasets.load_boston()
-boston = pd.read_csv("~/Documents/kaggle/output.csv")
+boston = pd.read_csv("output.csv")
 target = boston["Expected"]
-data = boston.ix[:,:-1].fillna(0)
-dataT = data.values.tolist()
-targetT = target.values.tolist()
+data = boston.ix[:,1:-1].fillna(0)
+dataT = np.array(data.values.tolist())
+targetT = np.array(target.values.tolist())
 
-print(dataT)
+#print(dataT)
 X, y = shuffle(dataT, targetT, random_state=13)
 #X, y = shuffle(boston.data, boston.target, random_state=13)
-print(boston.columns)
+#print(boston.columns)
 print(X.shape)
 print(y.shape)
 X = X.astype(np.float32)
@@ -44,7 +44,7 @@ X_test, y_test = X[offset:], y[offset:]
 
 ###############################################################################
 # Fit regression model
-params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 1,
+params = {'n_estimators': 100, 'max_depth': 4, 'min_samples_split': 1,
           'learning_rate': 0.01, 'loss': 'ls'}
 clf = ensemble.GradientBoostingRegressor(**params)
 
@@ -80,7 +80,7 @@ pos = np.arange(sorted_idx.shape[0]) + .5
 plt.subplot(1, 2, 2)
 plt.barh(pos, feature_importance[sorted_idx], align='center')
 #plt.yticks(pos, boston.feature_names[sorted_idx])
-plt.yticks(pos, np.array(boston.columns.tolist())[sorted_idx])
+plt.yticks(pos, np.array(boston.columns.tolist()[1:])[sorted_idx])
 #boston.columns
 plt.xlabel('Relative Importance')
 plt.title('Variable Importance')

@@ -12,6 +12,7 @@ def main():
 	fp = pd.read_csv(infile)
 	data = fp.ix[:,:].fillna("NA")
 	dataT = data.values.tolist()
+	dataT_merge = []
 
 	current_id = dataT[0][0]
 	count = [0]*24
@@ -46,6 +47,13 @@ def main():
 							inst[j] = summ[j]/count[j] 
 						except:
 							inst[j] = 0
+							
+			id_new = np.zeros(feature_num)
+			for i in indexList:
+				id_new = id_new + np.array(dataT[i])
+			id_new = id_new / len(indexList)
+			dataT_merge.append(list(id_new))
+				
 			indexList = []
 			count = [0]*24
 			summ = [0.0]*24
@@ -53,22 +61,14 @@ def main():
 			
 		index += 1
 		
+#	dataT_merge = [,dataT_merge]
+	outData = [data.columns.tolist()]
+	outData.extend(dataT_merge)
 
 	with open('output.csv', 'w') as f:
 		writer = csv.writer(f)
-		writer.writerows(dataT)
-'''
-    for i in range(0,23):
-        if count[i] != 0:
-            summ[i] /= count[i]
+		writer.writerows(outData)
 
-    for instance in dataT:
-        for i in range(24):
-            if (str(instance[i]) == "NA"):
-                instance[i] = summ[i]
-'''
-    #print(str(instance[6]).isdigit())
-    #print(dataT)
 
 	
 
