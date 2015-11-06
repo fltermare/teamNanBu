@@ -4,6 +4,7 @@ import numpy as np
 import csv
 import sys
 
+
 infile="../trainless.csv"
 #outfile="~/Documents/kaggle/proc_train.csv"
 

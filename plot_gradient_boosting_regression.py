@@ -3,6 +3,7 @@
 Gradient Boosting regression
 ============================
 
+
 Demonstrate Gradient Boosting on the Boston housing dataset.
 
 This example fits a Gradient Boosting model with least squares loss and
