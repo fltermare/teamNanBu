@@ -13,7 +13,7 @@ print(__doc__)
 # Author: Peter Prettenhofer <peter.prettenhofer@gmail.com>
 #
 # License: BSD 3 clause
-
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -31,8 +31,8 @@ data = train.ix[:,1:-1].fillna(0)
 dataT = np.array(data.values.tolist())
 targetT = np.array(target.values.tolist())
 
-testcsv = pd.read_csv("./csv/test.csv")
-testdata = testcsv.ix[:,:].fillna(0)
+testcsv = pd.read_csv("./testmerge.csv")
+testdata = testcsv.ix[:,1:].fillna(0)
 #print(dataT)
 X, y = shuffle(dataT, targetT, random_state=13)
 #X, y = shuffle(boston.data, boston.target, random_state=13)
@@ -54,6 +54,13 @@ clf.fit(X_train, y_train)
 mse = mean_squared_error(y_test, clf.predict(X_test))
 print("MSE: %.4f" % mse)
 
+###############################################################################
+predict = clf.predict(testdata)
+iiiid = np.array(testcsv['Id'])
+bbbb = list(np.vstack((iiiid.astype(int),predict)).T)
+with open("predict.csv", 'w') as f:
+	writer = csv.writer(f)
+	writer.writerows(bbbb)
 ###############################################################################
 # Plot training deviance
 
