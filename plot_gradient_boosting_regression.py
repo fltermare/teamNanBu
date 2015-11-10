@@ -25,12 +25,14 @@ from sklearn.metrics import mean_squared_error
 ###############################################################################
 # Load data
 #boston = datasets.load_boston()
-boston = pd.read_csv("output.csv")
-target = boston["Expected"]
-data = boston.ix[:,1:-1].fillna(0)
+train = pd.read_csv("output.csv")
+target = train["Expected"]
+data = train.ix[:,1:-1].fillna(0)
 dataT = np.array(data.values.tolist())
 targetT = np.array(target.values.tolist())
 
+testcsv = pd.read_csv("./csv/test.csv")
+testdata = testcsv.ix[:,:].fillna(0)
 #print(dataT)
 X, y = shuffle(dataT, targetT, random_state=13)
 #X, y = shuffle(boston.data, boston.target, random_state=13)
@@ -80,7 +82,7 @@ pos = np.arange(sorted_idx.shape[0]) + .5
 plt.subplot(1, 2, 2)
 plt.barh(pos, feature_importance[sorted_idx], align='center')
 #plt.yticks(pos, boston.feature_names[sorted_idx])
-plt.yticks(pos, np.array(boston.columns.tolist()[1:])[sorted_idx])
+plt.yticks(pos, np.array(train.columns.tolist()[1:])[sorted_idx])
 #boston.columns
 plt.xlabel('Relative Importance')
 plt.title('Variable Importance')
