@@ -18,14 +18,14 @@ from sklearn.metrics import mean_squared_error
 print("[*] Read merged training data")
 train = pd.read_csv("./csv/trainMerged.csv") #need to change to trainMerged.csv
 target = train["Expected"]
-data = train.ix[:,1:-1].fillna(0)
+data = train.ix[:,2:-1].fillna(0)
 dataT = np.array(data.values.tolist())
 targetT = np.array(target.values.tolist())
 print("[*] Done")
 
 print("[*] Read merged testing data")
 testcsv = pd.read_csv("./csv/testMerged.csv")
-testdata = testcsv.ix[:,1:].fillna(0)
+testdata = testcsv.ix[:,2:].fillna(0)
 print("[*] Done")
 
 X, y = shuffle(dataT, targetT, random_state=13)
@@ -70,10 +70,10 @@ if sys.argv[1] == 'gbr':
 	predict = clf.predict(X_test)
 	iid = np.array(testcsv['Id'])
 	predictPair = list(np.vstack((iid.astype(int),predict)).T)
-	
+
 	fw = open("predict_gbr.csv", 'w')
 	fw.write("Id,Expected\n")
-	k = 0 
+	k = 0
 	for i in range(1,717626):
 		print("[*] For instance " + str(i))
 		if i != predictPair[k][0]:
@@ -138,13 +138,13 @@ elif sys.argv[1] == 'svr':
 	#y_lin = svr_lin.fit(X_train, y_train).predict(X_test)
 	#y2_lin = svr_lin.fit(X2_train, y2_train).predict(X2_test)
 	#y_poly = svr_poly.fit(X_train, y_train).predict(X_test)
-	#y2_poly = svr_poly.fit(X2_train, y2_train).predict(X2_test)     
+	#y2_poly = svr_poly.fit(X2_train, y2_train).predict(X2_test)
 # Compute mse by deviding the training data into 10 parts, and use 1 part as the testing data to do validation
 	print("[*] Compute MSE")
 	mse_rbf = mean_squared_error(y2_test, y2_rbf)
 	#mse_lin = mean_squared_error(y2_test, y2_lin)
 	#mse_poly = mean_squared_error(y2_test, y2_poly)
-	
+
 	print("MSE(RBF): %.4f" % mse_rbf)
 	#print("MSE(LIN): %.4f" % mse_lin)
 	#print("MSE(POLY): %.4f" % mse_poly)
@@ -158,7 +158,7 @@ elif sys.argv[1] == 'svr':
 
 	fw = open("predict_svr.csv", 'w')
 	fw.write("Id,Expected\n")
-	k = 0 
+	k = 0
 	for i in range(1,717626):
 		if i != predictPair[k][0]:
 			fw.write(str(i) + ",0.254" + "\n")
