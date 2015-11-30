@@ -2,16 +2,14 @@
 import pandas as pd
 import numpy as np
 import csv
-import sys
+import copy
 import re
+import sys
 
-infile="./csv/train.csv"
-outfile1="./csv/trainWithoutEmpty.csv"
-outfile2="./csv/trainMerged.csv"
-def deleteMissing():
-    fp = open(infile, 'r')
+def deleteMissing(rawfile, tmpfile):
+    fp = open(rawfile, 'r')
     print("[*] Read train.csv")
-    fw = open(outfile1, 'w')
+    fw = open(tmpfile, 'w')
     print("[*] Deleting missing data")
 
     lastMin = 0
@@ -45,17 +43,17 @@ def deleteMissing():
 
     fw.close()
     fp.close()
-    print("[*] Done")
+    print("[>] Deleting finished")
 
-def mergeID():
+def mergeID(tmpfile, outputfile, setting):
     #merging instance with same id
-    fp = pd.read_csv(outfile1)
-    print("[*] Read trainWithoutEmpty")
+    fp = pd.read_csv(tmpfile)
+    print("[*] Read train without empty")
     data = fp.ix[:,:]
     dataT = data.values.tolist()
 
     ##name list of  attributes
-    fw = open(outfile2, 'w')
+    fw = open(outputfile, 'w')
     outData = [data.columns.tolist()]
     writer = csv.writer(fw)
     writer.writerows(outData)
@@ -65,15 +63,16 @@ def mergeID():
     lastMin = 0
     summ = np.array([0.0]*22)
     numTotol = len(dataT)
-
+    print("[*] Start merging")
     for i in range(0, numTotol):
         tmpID = int(dataT[i][0])
         if tmpID == current_id:
-            summ = summ + np.array(dataT[i])[1:-1] * (dataT[i][1] - lastMin)
+            summ = summ + partId(np.array(dataT[i]), setting) * (dataT[i][1] - lastMin)
 
             if i == numTotol-1:
-                avg = dataT[i-1]
-                avg[1:-1] = summ/dataT[i][1]
+                avg = avgId(dataT[i-1], summ/dataT[i][1])
+                #avg = dataT[i-1]
+                #avg[1:-1] = summ/dataT[i][1]
                 #dd = np.array(dd, dtype = np.float32)
                 #print("[>] summ at line "+ str(i)+":", end = "")
                 #print(dd)
@@ -81,13 +80,15 @@ def mergeID():
             else:
                 lastMin = dataT[i][1]
         else :
-            avg = dataT[i-1]
-            avg[1:-1] = summ/lastMin
+            avg = avgId(dataT[i-1], summ/lastMin)
+            #avg = dataT[i-1]
+            #avg[1:-1] = summ/lastMin
             #dd = np.array(dd, dtype = np.float32)
             #dd[0] = int(dd[0])
             #print("[>] summ at line "+ str(i)+":", end = "")
             #print(dd)
-            writer.writerows([list(avg)])
+            if lastMin != 0:
+                writer.writerows([list(avg)])
 
             if i == numTotol-1:
                 #This ID has only 1 instance and it's the last one
@@ -97,15 +98,43 @@ def mergeID():
                 #print(dd)
                 writer.writerows([list(avg)])
             else:
-                summ = np.array(dataT[i])[1:-1] * dataT[i][1]
+                summ = partId(np.array(dataT[i]), setting) * dataT[i][1]
                 current_id = int(dataT[i][0])
                 lastMin = dataT[i][1]
 
     fw.close()
+    print("[>] Merging finished")
+
+def partId(thisRow, setting):
+    if setting == "train":
+        return thisRow[1:-1]
+    elif setting == "test":
+        return thisRow[1:]
+    else:
+        print("[-] Error: setting:" + setting)
+
+def avgId(lastRow, averageId):
+    avg = lastRow
+    for i in range(len(averageId)):
+        avg[i+1] = averageId[i]
+    return avg
 
 def main():
-    deleteMissing()
-    mergeID()
+    if len(sys.argv) != 5:
+        print("[-] Usage: python3 preProcData.py [rawfile] [FileWithoutEmpty] [MergedFile] [test|train]")
+        print("[*] Execute with default configuration")
+        rawfile = "./csv/train.csv"
+        tmpfile = "./csv/trainWithoutEmpty.csv"
+        outputfile = "./csv/trainMerged.csv"
+        setting = "train"
+
+    else:
+        rawfile = sys.argv[1]
+        tmpfile = sys.argv[2]
+        outputfile = sys.argv[3]
+        setting = sys.argv[4]
+    deleteMissing(rawfile, tmpfile)
+    mergeID(tmpfile, outputfile, setting)
 
 
 if __name__ == "__main__":
