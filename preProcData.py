@@ -5,13 +5,11 @@ import csv
 import sys
 import re
 
-infile="./csv/train.csv"
-outfile1="./csv/trainWithoutEmpty.csv"
-outfile2="./csv/trainMerged.csv"
-def deleteMissing():
-    fp = open(infile, 'r')
+
+def deleteMissing(rawfile, tmpfile):
+    fp = open(rawfile, 'r')
     print("[*] Read train.csv")
-    fw = open(outfile1, 'w')
+    fw = open(tmpfile, 'w')
     print("[*] Deleting missing data")
 
     lastMin = 0
@@ -47,15 +45,15 @@ def deleteMissing():
     fp.close()
     print("[*] Done")
 
-def mergeID():
+def mergeID(tmpfile, outputfile):
     #merging instance with same id
-    fp = pd.read_csv(outfile1)
+    fp = pd.read_csv(tmpfile)
     print("[*] Read trainWithoutEmpty")
     data = fp.ix[:,:]
     dataT = data.values.tolist()
 
     ##name list of  attributes
-    fw = open(outfile2, 'w')
+    fw = open(outputfile, 'w')
     outData = [data.columns.tolist()]
     writer = csv.writer(fw)
     writer.writerows(outData)
@@ -104,8 +102,18 @@ def mergeID():
     fw.close()
 
 def main():
-    deleteMissing()
-    mergeID()
+    if len(sys.argv) != 4:
+        print("[-] Usage: python3 preProcData.py [rawfile] [FileWithoutEmpty] [MergedFile]")
+        print("[*] Execute with default configuration")
+        rawfile = "./csv/train.csv"
+        tmpfile = "./csv/trainWithoutEmpty.csv"
+        outputfile = "./csv/trainMerged.csv"
+    else:
+        rawfile = sys.argv[1]
+        tmpfile = sys.argv[2]
+        outputfile = sys.argv[3]
+    deleteMissing(rawfile, tmpfile)
+    mergeID(tmpfile, outputfile)
 
 
 if __name__ == "__main__":
