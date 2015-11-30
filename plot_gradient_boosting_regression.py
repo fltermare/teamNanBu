@@ -16,7 +16,7 @@ from sklearn.metrics import mean_squared_error
 # X = data
 # y = target
 print("[*] Read merged training data")
-train = pd.read_csv("./csv/trainMerged.csv") #need to change to trainMerged.csv
+train = pd.read_csv("./csv/trainDBZ.csv") #need to change to trainMerged.csv
 target = train["Expected"]
 data = train.ix[:,2:-1].fillna(0)
 dataT = np.array(data.values.tolist())
@@ -65,26 +65,28 @@ if sys.argv[1] == 'gbr':
 
 ###############################################################################
 # Output the prediction result to predict_gbr.csv
-	'''
+	#'''
 	print("[*] Output the prediction file")
-	predict = clf.predict(X_test)
+	predict = clf2.predict(X_test)
 	iid = np.array(testcsv['Id'])
+	ref = np.array(testcsv['Ref'])
 	predictPair = list(np.vstack((iid.astype(int),predict)).T)
 
 	fw = open("predict_gbr.csv", 'w')
 	fw.write("Id,Expected\n")
 	k = 0
 	for i in range(1,717626):
-		print("[*] For instance " + str(i))
+		#print("[*] For instance " + str(i))
 		if i != predictPair[k][0]:
-			fw.write(str(i) + ",0.254" + "\n")
+			fw.write(str(i) + ",0.254" + "\n") #for empty line that does not exist
 		elif i == predictPair[k][0]:
-			if predictPair[k][1] < 0:
-				fw.write(str(i) + ",0" + "\n")
-			else:
-				fw.write(str(i) + "," + str(predictPair[k][1]) + "\n")
-			k = k+1
-	'''
+		    result = predictPair[k][1] + pow(pow(10, ref[k]/10)/200, 0.625)
+		    if result < 0:
+		        fw.write(str(i) + ",0" + "\n")
+		    else:
+		        fw.write(str(i) + "," + str(result) + "\n")
+		    k = k+1
+	#'''
 ###############################################################################
 # Plot training deviance
 # compute test set deviance
@@ -111,7 +113,7 @@ if sys.argv[1] == 'gbr':
 	pos = np.arange(sorted_idx.shape[0]) + .5
 	plt.subplot(1, 2, 2)
 	plt.barh(pos, feature_importance[sorted_idx], align='center')
-	plt.yticks(pos, np.array(train.columns.tolist()[1:])[sorted_idx])
+	plt.yticks(pos, np.array(train.columns.tolist()[2:])[sorted_idx])
 	plt.xlabel('Relative Importance')
 	plt.title('Variable Importance')
 	plt.show()
