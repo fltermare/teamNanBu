@@ -15,14 +15,18 @@ from sklearn.metrics import mean_squared_error
 # Import data set and process
 # X = data
 # y = target
-train = pd.read_csv("training.csv")
+print("[*] Read merged training data")
+train = pd.read_csv("./csv/trainmerge.csv") #need to change to trainMerged.csv
 target = train["Expected"]
 data = train.ix[:,1:-1].fillna(0)
 dataT = np.array(data.values.tolist())
 targetT = np.array(target.values.tolist())
+print("[*] Done")
 
-testcsv = pd.read_csv("./testmergeless.csv")
+print("[*] Read merged testing data")
+testcsv = pd.read_csv("./csv/testmerge.csv")
 testdata = testcsv.ix[:,1:].fillna(0)
+print("[*] Done")
 
 X, y = shuffle(dataT, targetT, random_state=13)
 X = X.astype(np.float32)
@@ -46,6 +50,8 @@ X2_test, y2_test = X[offset:], y[offset:]
 # Fit regression model
 
 if sys.argv[1] == 'gbr':
+	print("[*] Running Gradient Boost Regression")
+	print("[*] Fit regression model")
 	params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 1,'learning_rate': 0.01, 'loss': 'ls'}
 	clf = ensemble.GradientBoostingRegressor(**params)
 	clf.fit(X_train, y_train)
@@ -53,21 +59,32 @@ if sys.argv[1] == 'gbr':
 	clf2 = ensemble.GradientBoostingRegressor(**params)
 	clf2.fit(X2_train, y2_train)
 
+	print("[*] Compute MSE")
 	mse = mean_squared_error(y2_test, clf2.predict(X2_test))
 	print("MSE: %.4f" % mse)
 
 ###############################################################################
 # Output the prediction result to predict_gbr.csv
+	print("[*] Output the prediction file")
 	predict = clf.predict(X_test)
-	iiiid = np.array(testcsv['Id'])
-	bbbb = list(np.vstack((iiiid.astype(int),predict)).T)
-	with open("predict_gbr.csv", 'w') as f:
-		writer = csv.writer(f)
-		writer.writerows(bbbb)
+	iid = np.array(testcsv['Id'])
+	predictPair = list(np.vstack((iid.astype(int),predict)).T)
+	
+	fw = open("predict_gbr.csv", 'w')
+	fw.write("Id,Expected\n")
+	k = 0 
+	for i in range(1,84):
+		if i != predictPair[k][0]:
+			fw.write(str(i) + ",99" + "\n")
+		elif i == predictPair[k][0]:
+			if predictPair[k][1] < 0:
+				fw.write(str(i) + ",0" + "\n")
+			else:
+				fw.write(str(i) + "," + str(predictPair[k][1]) + "\n")
+			k = k+1
 ###############################################################################
 # Plot training deviance
 # compute test set deviance
-
 	test_score = np.zeros((params['n_estimators'],), dtype=np.float64)
 
 	for i, y_pred in enumerate(clf2.staged_decision_function(X2_test)):
@@ -106,31 +123,45 @@ elif sys.argv[1] == 'svr':
         #y[::5] += 3 * (0.5 - np.random.rand(8))
 # Fit regression model
 # Set the parameters
-        svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
-        svr_lin = SVR(kernel='linear', C=1e3)
-        svr_poly = SVR(kernel='poly', C=1e3, degree=2)
+	print("[*] Running Support Vector Regression")
+	print("[*] Fit regression model")
+	svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
+	svr_lin = SVR(kernel='linear', C=1e3)
+	svr_poly = SVR(kernel='poly', C=1e3, degree=2)
 
 # Fit and predict y2 is used to compute mse, the real output is y
-        y_rbf = svr_rbf.fit(X_train, y_train).predict(X_test)
-        y2_rbf = svr_rbf.fit(X2_train, y2_train).predict(X2_test)
-        y_lin = svr_lin.fit(X_train, y_train).predict(X_test)
-        y2_lin = svr_lin.fit(X2_train, y2_train).predict(X2_test)
-        y_poly = svr_poly.fit(X_train, y_train).predict(X_test)
-        y2_poly = svr_poly.fit(X2_train, y2_train).predict(X2_test)     
+	y_rbf = svr_rbf.fit(X_train, y_train).predict(X_test)
+	y2_rbf = svr_rbf.fit(X2_train, y2_train).predict(X2_test)
+	y_lin = svr_lin.fit(X_train, y_train).predict(X_test)
+	y2_lin = svr_lin.fit(X2_train, y2_train).predict(X2_test)
+	y_poly = svr_poly.fit(X_train, y_train).predict(X_test)
+	y2_poly = svr_poly.fit(X2_train, y2_train).predict(X2_test)     
 # Compute mse by deviding the training data into 10 parts, and use 1 part as the testing data to do validation
-        mse_rbf = mean_squared_error(y2_test, y2_rbf)
-        mse_lin = mean_squared_error(y2_test, y2_lin)
-        mse_poly = mean_squared_error(y2_test, y2_poly)
-
-        print("MSE(RBF): %.4f" % mse_rbf)
-        print("MSE(LIN): %.4f" % mse_lin)
-        print("MSE(POLY): %.4f" % mse_poly)
+	print("[*] Compute MSE")
+	mse_rbf = mean_squared_error(y2_test, y2_rbf)
+	mse_lin = mean_squared_error(y2_test, y2_lin)
+	mse_poly = mean_squared_error(y2_test, y2_poly)
+	
+	print("MSE(RBF): %.4f" % mse_rbf)
+	print("MSE(LIN): %.4f" % mse_lin)
+	print("MSE(POLY): %.4f" % mse_poly)
 
 # Output the prediction to predict_svr.csv
+	print("[*] Output the prediction file")
 	predict = y_rbf
-        iiiid = np.array(testcsv['Id'])
-        bbbb = list(np.vstack((iiiid.astype(int),predict)).T)
-        with open("predict_svr.csv", 'w') as f:
-                writer = csv.writer(f)
-                writer.writerows(bbbb)
+	iid = np.array(testcsv['Id'])
+	predictPair = list(np.vstack((iid.astype(int),predict)).T)
+
+	fw = open("predict_svr.csv", 'w')
+	fw.write("Id,Expected\n")
+	k = 0 
+	for i in range(1,84):
+		if i != predictPair[k][0]:
+			fw.write(str(i) + ",99" + "\n")
+		elif i == predictPair[k][0]:
+			if predictPair[k][1] < 0:
+				fw.write(str(i) + ",0" + "\n")
+			else:
+				fw.write(str(i) + "," + str(predictPair[k][1]) + "\n")
+			k = k+1
 
