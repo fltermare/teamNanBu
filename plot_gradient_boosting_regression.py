@@ -16,7 +16,7 @@ from sklearn.metrics import mean_squared_error
 # X = data
 # y = target
 print("[*] Read merged training data")
-train = pd.read_csv("./csv/trainmerge.csv") #need to change to trainMerged.csv
+train = pd.read_csv("./csv/trainMerged.csv") #need to change to trainMerged.csv
 target = train["Expected"]
 data = train.ix[:,1:-1].fillna(0)
 dataT = np.array(data.values.tolist())
@@ -24,7 +24,7 @@ targetT = np.array(target.values.tolist())
 print("[*] Done")
 
 print("[*] Read merged testing data")
-testcsv = pd.read_csv("./csv/testmerge.csv")
+testcsv = pd.read_csv("./csv/testMerged.csv")
 testdata = testcsv.ix[:,1:].fillna(0)
 print("[*] Done")
 
@@ -53,8 +53,8 @@ if sys.argv[1] == 'gbr':
 	print("[*] Running Gradient Boost Regression")
 	print("[*] Fit regression model")
 	params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 1,'learning_rate': 0.01, 'loss': 'ls'}
-	clf = ensemble.GradientBoostingRegressor(**params)
-	clf.fit(X_train, y_train)
+	#clf = ensemble.GradientBoostingRegressor(**params)
+	#clf.fit(X_train, y_train)
 
 	clf2 = ensemble.GradientBoostingRegressor(**params)
 	clf2.fit(X2_train, y2_train)
@@ -65,6 +65,7 @@ if sys.argv[1] == 'gbr':
 
 ###############################################################################
 # Output the prediction result to predict_gbr.csv
+	'''
 	print("[*] Output the prediction file")
 	predict = clf.predict(X_test)
 	iid = np.array(testcsv['Id'])
@@ -73,15 +74,17 @@ if sys.argv[1] == 'gbr':
 	fw = open("predict_gbr.csv", 'w')
 	fw.write("Id,Expected\n")
 	k = 0 
-	for i in range(1,84):
+	for i in range(1,717626):
+		print("[*] For instance " + str(i))
 		if i != predictPair[k][0]:
-			fw.write(str(i) + ",99" + "\n")
+			fw.write(str(i) + ",0.254" + "\n")
 		elif i == predictPair[k][0]:
 			if predictPair[k][1] < 0:
 				fw.write(str(i) + ",0" + "\n")
 			else:
 				fw.write(str(i) + "," + str(predictPair[k][1]) + "\n")
 			k = k+1
+	'''
 ###############################################################################
 # Plot training deviance
 # compute test set deviance
@@ -126,27 +129,28 @@ elif sys.argv[1] == 'svr':
 	print("[*] Running Support Vector Regression")
 	print("[*] Fit regression model")
 	svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
-	svr_lin = SVR(kernel='linear', C=1e3)
-	svr_poly = SVR(kernel='poly', C=1e3, degree=2)
+	#svr_lin = SVR(kernel='linear', C=1e3)
+	#svr_poly = SVR(kernel='poly', C=1e3, degree=2)
 
 # Fit and predict y2 is used to compute mse, the real output is y
-	y_rbf = svr_rbf.fit(X_train, y_train).predict(X_test)
+	#y_rbf = svr_rbf.fit(X_train, y_train).predict(X_test)
 	y2_rbf = svr_rbf.fit(X2_train, y2_train).predict(X2_test)
-	y_lin = svr_lin.fit(X_train, y_train).predict(X_test)
-	y2_lin = svr_lin.fit(X2_train, y2_train).predict(X2_test)
-	y_poly = svr_poly.fit(X_train, y_train).predict(X_test)
-	y2_poly = svr_poly.fit(X2_train, y2_train).predict(X2_test)     
+	#y_lin = svr_lin.fit(X_train, y_train).predict(X_test)
+	#y2_lin = svr_lin.fit(X2_train, y2_train).predict(X2_test)
+	#y_poly = svr_poly.fit(X_train, y_train).predict(X_test)
+	#y2_poly = svr_poly.fit(X2_train, y2_train).predict(X2_test)     
 # Compute mse by deviding the training data into 10 parts, and use 1 part as the testing data to do validation
 	print("[*] Compute MSE")
 	mse_rbf = mean_squared_error(y2_test, y2_rbf)
-	mse_lin = mean_squared_error(y2_test, y2_lin)
-	mse_poly = mean_squared_error(y2_test, y2_poly)
+	#mse_lin = mean_squared_error(y2_test, y2_lin)
+	#mse_poly = mean_squared_error(y2_test, y2_poly)
 	
 	print("MSE(RBF): %.4f" % mse_rbf)
-	print("MSE(LIN): %.4f" % mse_lin)
-	print("MSE(POLY): %.4f" % mse_poly)
+	#print("MSE(LIN): %.4f" % mse_lin)
+	#print("MSE(POLY): %.4f" % mse_poly)
 
 # Output the prediction to predict_svr.csv
+	'''
 	print("[*] Output the prediction file")
 	predict = y_rbf
 	iid = np.array(testcsv['Id'])
@@ -155,13 +159,13 @@ elif sys.argv[1] == 'svr':
 	fw = open("predict_svr.csv", 'w')
 	fw.write("Id,Expected\n")
 	k = 0 
-	for i in range(1,84):
+	for i in range(1,717626):
 		if i != predictPair[k][0]:
-			fw.write(str(i) + ",99" + "\n")
+			fw.write(str(i) + ",0.254" + "\n")
 		elif i == predictPair[k][0]:
 			if predictPair[k][1] < 0:
 				fw.write(str(i) + ",0" + "\n")
 			else:
 				fw.write(str(i) + "," + str(predictPair[k][1]) + "\n")
 			k = k+1
-
+	'''
