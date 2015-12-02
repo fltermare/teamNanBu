@@ -120,8 +120,8 @@ def avgId(lastRow, averageId):
     return avg
 
 def main():
-    if len(sys.argv) != 5:
-        print("[-] Usage: python3 preProcData.py [rawfile] [FileWithoutEmpty] [MergedFile] [test|train]")
+    if len(sys.argv) != 4:
+        print("[-] Usage: python3 preProcData.py [rawfile] [MergedFile] [test|train]")
         print("[*] Execute with default configuration")
         rawfile = "./csv/train.csv"
         tmpfile = "./csv/trainWithoutEmpty.csv"
@@ -130,9 +130,9 @@ def main():
 
     else:
         rawfile = sys.argv[1]
-        tmpfile = sys.argv[2]
-        outputfile = sys.argv[3]
-        setting = sys.argv[4]
+        tmpfile = "./csv/"+sys.argv[3]+"WithoutEmpty.csv"
+        outputfile = sys.argv[2]
+        setting = sys.argv[3]
     deleteMissing(rawfile, tmpfile)
     mergeID(tmpfile, outputfile, setting)
 
