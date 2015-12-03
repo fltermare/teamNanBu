@@ -8,7 +8,7 @@ import sys
 
 def deleteMissing(inputfile, tmpfile, setting, indexlist):
     fp = open(inputfile, 'r')
-    print("[*] Read train.csv")
+    print("[*] Read "+inputfile)
     fw = open(tmpfile, 'w')
     print("[*] Deleting missing data")
 
@@ -142,7 +142,7 @@ def main():
     if len(sys.argv) != 5:
         print("[-] Usage: python3 preProcData.py [inputfile] [MergedFile] [test|train] [indexOfAttributes]")
         print("[*] Execute with default configuration")
-        inputfile = "./csv/train.csv"
+        inputfile = "./csv/train_append_dbz.csv"
         tmpfile = "./csv/trainWithoutEmpty.csv"
         outputfile = "./csv/trainMerged.csv"
         setting = "train"
