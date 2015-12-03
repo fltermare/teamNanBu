@@ -10,7 +10,7 @@ from sklearn import datasets
 from sklearn.utils import shuffle
 from sklearn.metrics import mean_squared_error
 
-###############################################################################
+##############################################################################
 ##############################################################################
 
 # Import data set and process
@@ -19,18 +19,20 @@ from sklearn.metrics import mean_squared_error
 print("[*] Read merged training data")
 train = pd.read_csv("./csv/trainMerged.csv") #need to change to trainMerged.csv
 target = train["Expected"]
-data = pd.concat([train.ix[:,2:5],train.ix[:,6:9],train.ix[:,10:12],train.ix[:,16],train.ix[:,18], train.ix[:,19]], axis=1)
+trainRef = train["Ref"]
+data = train.iloc[:,[2,3,5,6,7,9,10,11,15,17,18]]
 dataT = np.array(data.values.tolist())
 targetT = np.array(target.values.tolist())
+trainRefT = np.array(trainRef.values.tolist())
 print("[*] Done")
 
 print("[*] Read merged testing data")
 testcsv = pd.read_csv("./csv/testMerged.csv")
-#testdata = testcsv.ix[:,2:].fillna(0)
-testdata = pd.concat([testcsv.ix[:,2:5],testcsv.ix[:,6:9],testcsv.ix[:,10:12],testcsv.ix[:,16],testcsv.ix[:,18], testcsv.ix[:,19]], axis=1)
+testdata = testcsv.iloc[:,[2,3,5,6,7,9,10,11,15,17,18]]
+
 print("[*] Done")
 
-X, y = shuffle(dataT, targetT, random_state=13)
+X, y, z = shuffle(dataT, targetT, trainRefT, random_state=13)
 X = X.astype(np.float32)
 
 X_train, y_train = X, y
@@ -60,10 +62,12 @@ if sys.argv[1] == 'xgb':
 
     #clf2 = ensemble.GradientBoostingRegressor(**params)
     #clf2.fit(X2_train, y2_train)
-    clf2 = xgb.XGBRegressor(max_depth=6, n_estimators=300, learning_rate=0.05, nthread=1)
+    clf2 = xgb.XGBRegressor(max_depth=6, n_estimators=500, learning_rate=0.05, nthread=1)
     clf2.fit(X2_train, y2_train)
     print("[*] Compute MSE")
-    mse = mean_squared_error(y2_test, clf2.predict(X2_test))
+    predict1st = clf2.predict(X2_test)
+    print(predict1st)
+    mse = mean_squared_error(y2_test, predict1st)
     print("MSE: %.4f" % mse)
 
 ###############################################################################
@@ -74,11 +78,11 @@ if sys.argv[1] == 'xgb':
     iid = np.array(testcsv['Id'])
     predictPair = list(np.vstack((iid.astype(int),predict)).T)
 
-    fw = open("predict_gbr.csv", 'w')
+    fw = open("predict_xgb.csv", 'w')
     fw.write("Id,Expected\n")
     k = 0
     for i in range(1,717624):
-        print("[*] For instance " + str(i))
+        #print("[*] For instance " + str(i))
         if i != predictPair[k][0]:
             fw.write(str(i) + ",0.254" + "\n")
         elif i == predictPair[k][0]:
