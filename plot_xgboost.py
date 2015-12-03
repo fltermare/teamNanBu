@@ -16,11 +16,12 @@ from sklearn.metrics import mean_squared_error
 # Import data set and process
 # X = data
 # y = target
+
 print("[*] Read merged training data")
 train = pd.read_csv("./csv/trainMerged.csv") #need to change to trainMerged.csv
 target = train["Expected"]
 trainRef = train["Ref"]
-data = train.iloc[:,[2,3,5,6,7,9,10,11,15,17,18]]
+data = train.iloc[:,2:-2]
 dataT = np.array(data.values.tolist())
 targetT = np.array(target.values.tolist())
 trainRefT = np.array(trainRef.values.tolist())
@@ -28,7 +29,7 @@ print("[*] Done")
 
 print("[*] Read merged testing data")
 testcsv = pd.read_csv("./csv/testMerged.csv")
-testdata = testcsv.iloc[:,[2,3,5,6,7,9,10,11,15,17,18]]
+testdata = testcsv.iloc[:,2:-1]
 
 print("[*] Done")
 
