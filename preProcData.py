@@ -71,31 +71,17 @@ def mergeID(tmpfile, outputfile, setting):
 
             if i == numTotol-1:
                 avg = avgId(dataT[i-1], summ/dataT[i][1])
-                #avg = dataT[i-1]
-                #avg[1:-1] = summ/dataT[i][1]
-                #dd = np.array(dd, dtype = np.float32)
-                #print("[>] summ at line "+ str(i)+":", end = "")
-                #print(dd)
                 writer.writerows([list(avg)])
             else:
                 lastMin = dataT[i][1]
         else :
             avg = avgId(dataT[i-1], summ/lastMin)
-            #avg = dataT[i-1]
-            #avg[1:-1] = summ/lastMin
-            #dd = np.array(dd, dtype = np.float32)
-            #dd[0] = int(dd[0])
-            #print("[>] summ at line "+ str(i)+":", end = "")
-            #print(dd)
             if lastMin != 0:
                 writer.writerows([list(avg)])
 
             if i == numTotol-1:
                 #This ID has only 1 instance and it's the last one
                 avg = dataT[i]
-                #dd = np.array(dd, dtype = np.float32)
-                #print("[>] summ at line "+ str(i)+":", end = "")
-                #print(dd)
                 writer.writerows([list(avg)])
             else:
                 summ = partId(np.array(dataT[i]), setting) * dataT[i][1]
