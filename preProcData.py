@@ -141,13 +141,13 @@ def avgId(lastRow, averageId):
 def main():
     if len(sys.argv) != 5:
         print("[-] Usage: python3 preProcData.py [inputfile] [MergedFile] [test|train] [indexOfAttributes]")
-        print("[-] Example : python3 preProcData.py ./csv/train_append_dbz.csv ./csv/trainMerged.csv train 2,3,5,6,7,9,10,11,15,17,18")
+        print("[-] Example : python3 preProcData.py ./csv/train_append_dbz.csv ./csv/trainMerged.csv train 2,5,6,7,9,10,15,17,18")
         print("[*] Execute with default configuration")
         inputfile = "./csv/train_append_dbz.csv"
         tmpfile = "./csv/trainWithoutEmpty.csv"
         outputfile = "./csv/trainMerged.csv"
         setting = "train"
-        indexlist = [2, 3, 5, 6, 7, 9, 10, 11, 15, 17, 18]
+        indexlist = [2, 5, 6, 7, 9, 10, 15, 17, 18]
     else:
         inputfile = sys.argv[1]
         tmpfile = "./csv/"+sys.argv[3]+"WithoutEmpty.csv"

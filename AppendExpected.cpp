@@ -79,7 +79,7 @@ int main(int argc,char *argv[]){
                 if(i!=0)fprintf(fout,",");
                 fprintf(fout,"%s",sa[i].c_str());
             }
-            fprintf(fout,",%s",sb[1].c_str());
+            fprintf(fout,",%s\n",sb[1].c_str());
         }
 
     }

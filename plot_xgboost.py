@@ -20,20 +20,21 @@ from sklearn.metrics import mean_squared_error
 print("[*] Read merged training data")
 train = pd.read_csv("./csv/trainMerged.csv") #need to change to trainMerged.csv
 target = train["Expected"]
-trainRef = train["Ref"]
-data = train.iloc[:,2:-2]
+
+#idx= [2,]
+data = train.iloc[:,2:-1]
 dataT = np.array(data.values.tolist())
 targetT = np.array(target.values.tolist())
-trainRefT = np.array(trainRef.values.tolist())
+
 print("[*] Done")
 
 print("[*] Read merged testing data")
 testcsv = pd.read_csv("./csv/testMerged.csv")
-testdata = testcsv.iloc[:,2:-1]
+testdata = testcsv.iloc[:,2:]
 
 print("[*] Done")
 
-X, y, z = shuffle(dataT, targetT, trainRefT, random_state=13)
+X, y = shuffle(dataT, targetT, random_state=13)
 X = X.astype(np.float32)
 
 X_train, y_train = X, y
