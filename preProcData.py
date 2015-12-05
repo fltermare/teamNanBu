@@ -51,13 +51,19 @@ def validOrNot(lines, setting, indexlist):
     for i in indexlist:
         if not lines[i]:
             return False
+    for i in [2, 3, 5, 6, 7, 9, 10]:
+        try:
+            if float(lines[i]) < 0:
+                return False
+        except:
+            continue
 
     if setting == "test":
         return True
 
     #rainfall < 70 mm/hr
     try :
-        if float(lines[-1]) > 70:
+        if float(lines[-1]) > 50:
             return False
     except:
         if lines[-1] != "Expected":
@@ -152,7 +158,7 @@ def main():
         inputfile = sys.argv[1]
         tmpfile = "./csv/"+sys.argv[3]+"WithoutEmpty.csv"
         outputfile = sys.argv[2]
-        setting = sys.argv[3]
+        setting = sys.argv[3].strip()
         indexlist = [int(x) for x in list(sys.argv[4].strip().split(',')) ]
 
     deleteMissing(inputfile, tmpfile, setting, indexlist)
