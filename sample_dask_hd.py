@@ -29,7 +29,7 @@ else:
 #alldata = dd.read_csv(infile)
 #alldata = alldata.set_index('Id')
 
-def interpolation(ref_list,valid_time_list,number=100):
+def interpolation(ref_list,valid_time_list,number=10):
     ans_valid_time = np.array([valid_time_list[0]])
     ans_ref = np.array([ref_list[0]])
     
@@ -52,7 +52,7 @@ def interpolation(ref_list,valid_time_list,number=100):
     
     return (ans_ref,ans_valid_time)
 
-def marshall_palmer(ref, minutes_past):
+def marshall_palmer(ref, minutes_past,num=10):
     #print "Estimating rainfall from {0} observations".format(len(minutes_past))
     # how long is each observation valid?
     valid_time = np.zeros_like(minutes_past)
@@ -64,7 +64,7 @@ def marshall_palmer(ref, minutes_past):
 
     # sum up rainrate * validtime
     
-    rf,vt = interpolation(ref,valid_time,number=100)
+    rf,vt = interpolation(ref,valid_time,number=num)
     sum = 0
     #for dbz, hours in zip(ref, valid_time):
     for dbz, hours in zip(rf, vt):
@@ -76,27 +76,19 @@ def marshall_palmer(ref, minutes_past):
 
 
 # each unique Id is an hour of data at some gauge
-def myfunc(hour):
+def myfunc(hour,num=10):
     
     #rowid = hour['Id'].iloc[0]
     # sort hour by minutes_past
     #hour = hour.sort('minutes_past', ascending=True)
     
     if len(hour['Ref'])>0:
-        est = marshall_palmer(hour['Ref'], hour['minutes_past'])
+        est = marshall_palmer(hour['Ref'], hour['minutes_past'],num=num)
         return est
     else:
-        return 0.0254
+        return 0.254
 
-# this writes out the file, but there is a bug in dask
-# where the column name is '0': https://github.com/blaze/dask/pull/621
-#estimates = alldata.groupby(alldata.index).apply(myfunc, columns='Expected')
-#estimates.to_csv(outfile, header=True)
-
-def main():
-    infile="train.csv"
-    outfile="sample_solution_hd100_train.csv"
-    
+def process(infile,outfile,interpnum):
     fp = pd.read_csv(infile)
     time = fp['minutes_past'].values.tolist()
     ref = fp['Ref'].values.tolist()
@@ -116,7 +108,7 @@ def main():
         if Idp != Idn:
             newID.append(Idp)
             print('[*] Calculating -> ID %d'%Idp)
-            expected.append(myfunc(hour))
+            expected.append(myfunc(hour,interpnum))
             hour = {'Ref':np.array([]),'minutes_past':np.array([])}
         else:
             if reflect:
@@ -127,7 +119,7 @@ def main():
         hour['Ref'] = np.append(hour['Ref'],ref[-1])
         hour['minutes_past'] = np.append(hour['minutes_past'],time[-1])
     newID.append(ID[-1])
-    expected.append(myfunc(hour))
+    expected.append(myfunc(hour,interpnum))
     
     print('[>] Write into %s.'%outfile)
     writer.writerows([['Id','Expected']])
@@ -137,13 +129,23 @@ def main():
     
     
     fw.close()
-    try:
-        measured = numpy.array(fp['Expected'].values.tolist())
-        calculated = numpy.array(expected)
-        MSE = pow( np.average((measured - calculated )**2) ,0.5)
-        print('MSE:%f'%MSE)
-    except:
-        pass
+    #try:
+    #    measured = numpy.array(fp['Expected'].values.tolist())
+    #    calculated = numpy.array(expected)
+    #    MSE = pow( np.average((measured - calculated )**2) ,0.5)
+    #    print('MSE:%f'%MSE)
+    #except:
+    #    pass
+    
+def main():
+    interpnum = 10
+
+    #infile="test.csv"
+    #outfile="sample_solution_hd_10_test.csv"
+    
+    process('test.csv','sample_solution_hd_%d_test.csv'%interpnum,interpnum)
+    process('train.csv','sample_solution_hd_%d_train.csv'%interpnum,interpnum)
+    
     print('[*] Done.')
     
     
