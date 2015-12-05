@@ -23,8 +23,7 @@ target = train["Expected"]
 
 #idx= [2,]
 data = train.iloc[:,2:-1]
-dataT = np.array(data.values.tolist())
-targetT = np.array(target.values.tolist())
+dataT, targetT = shuffle(np.array(data.values.tolist()), np.array(target.values.tolist()), random_state=13)
 
 print("[*] Done")
 
