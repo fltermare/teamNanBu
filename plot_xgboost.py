@@ -34,7 +34,8 @@ testdata = testcsv.iloc[:,2:]
 
 print("[*] Done")
 
-X, y = shuffle(dataT, targetT, random_state=13)
+#X, y = shuffle(dataT, targetT, random_state=13)
+X, y = dataT, targetT
 X = X.astype(np.float32)
 
 X_train, y_train = X, y
@@ -68,6 +69,8 @@ if sys.argv[1] == 'xgb':
     clf2.fit(X2_train, y2_train)
     print("[*] Compute MSE")
     predict1st = clf2.predict(X2_test)
+    for i in range(len(predict1st)):
+        predict1st[i] = round(predict1st[i]/0.254) * 0.254
     print(predict1st)
     mse = mean_squared_error(y2_test, predict1st)
     print("MSE: %.4f" % mse)
@@ -91,7 +94,8 @@ if sys.argv[1] == 'xgb':
             if predictPair[k][1] < 0:
                 fw.write(str(i) + ",0" + "\n")
             else:
-                fw.write(str(i) + "," + str(predictPair[k][1]) + "\n")
+                #fw.write(str(i) + "," + str(predictPair[k][1] + "\n")
+                fw.write(str(i) + "," + str(round(predictPair[k][1]/0.254)*0.254) + "\n")
             k = k+1
     fw.write("717624,0.254" + "\n")
     fw.write("717625,0.254" + "\n")
