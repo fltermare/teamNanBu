@@ -20,16 +20,20 @@ from sklearn.metrics import mean_squared_error
 print("[*] Read merged training data")
 train = pd.read_csv("./csv/trainMerged.csv") #need to change to trainMerged.csv
 target = train["Expected"]
+dbz = train["dbz"]
+data = train.iloc[:,2:-2]
 
-#idx= [2,]
-data = train.iloc[:,2:-1]
-dataT, targetT = shuffle(np.array(data.values.tolist()), np.array(target.values.tolist()), random_state=13)
+dataT = np.array(data.values.tolist())
+targetT = np.array(target.values.tolist())
+dbzT = np.array(dbz.values.tolist())
 
+dataT, targetT, dbzT = shuffle(dataT, targetT, dbzT, random_state=13)
 print("[*] Done")
 
 print("[*] Read merged testing data")
 testcsv = pd.read_csv("./csv/testMerged.csv")
-testdata = testcsv.iloc[:,2:]
+testdata = testcsv.iloc[:,2:-1]
+testdbz = testcsv["dbz"]
 
 print("[*] Done")
 
@@ -69,6 +73,7 @@ if sys.argv[1] == 'xgb':
     print("[*] Compute MSE")
     predict1st = clf2.predict(X2_test)
     for i in range(len(predict1st)):
+        predict1st[i] = 0.788*predict1st[i] + 0.212*dbzT[i]
         predict1st[i] = round(predict1st[i]/0.254) * 0.254
     print(predict1st)
     mse = mean_squared_error(y2_test, predict1st)
@@ -94,6 +99,7 @@ if sys.argv[1] == 'xgb':
                 fw.write(str(i) + ",0" + "\n")
             else:
                 #fw.write(str(i) + "," + str(predictPair[k][1] + "\n")
+                predictPair[k][1] = 0.788*predictPair[k][1] + 0.212*testdbz[k]
                 fw.write(str(i) + "," + str(round(predictPair[k][1]/0.254)*0.254) + "\n")
             k = k+1
     fw.write("717624,0.254" + "\n")
