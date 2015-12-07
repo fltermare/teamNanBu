@@ -62,15 +62,39 @@ def validOrNot(lines, setting, indexlist):
         return True
 
     #rainfall < 70 mm/hr
+    #0.25400013 295423
+    #0.50800025 121834
+    #0.7620004 71274
+    #1.0160005 69179
+    #1.2700007 45681
+    #1.5240008 36973
+    #2.032001 29548
+    #1.778001 29467
+    #2.2860012 23353
+    #2.5400014 20862
+    class_candidate = [0.25400013,0.50800025,0.7620004,1.0160005,1.2700007,1.5240008,2.032001,1.778001,2.2860012,2.5400014]
     try :
-        if float(lines[-1]) > 50:
+        if float(lines[-1]) > 50 and not_in(class_candidate,float(lines[-1])):
             return False
     except:
         if lines[-1] != "Expected":
             print("[-] Error:"+lines[-1])
 
     return True
-
+    
+def float_equal(a, b, accuracy):
+    return abs(a - b) < accuracy
+    
+def not_in(class_candidate,element):
+    ans = True
+    for c in class_candidate:
+        if float_equal(c,element,0.000001):
+            ans = False
+            break
+        else:
+            continue
+    return ans
+    
 def mergeID(tmpfile, outputfile, setting, indexlist):
     #merging instance with same id
     fp = pd.read_csv(tmpfile)
