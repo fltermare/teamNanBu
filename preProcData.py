@@ -74,7 +74,7 @@ def validOrNot(lines, setting, indexlist):
     #2.5400014 20862
     class_candidate = [0.25400013,0.50800025,0.7620004,1.0160005,1.2700007,1.5240008,2.032001,1.778001,2.2860012,2.5400014]
     try :
-        if float(lines[-1]) > 50 and not_in(class_candidate,float(lines[-1])):
+        if float(lines[-1]) > 50 or not_in(class_candidate,float(lines[-1])):
             return False
     except:
         if lines[-1] != "Expected":
